@@ -1,0 +1,54 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/api_final_work
+    username: root
+    password: 162881772
+
+  servlet:
+    multipart:
+      max-file-size: 100MB # 设置最大文件大小，这里是10MB，你可以根据需求调整
+      max-request-size: 100MB # 设置最大请求大小，同样可以根据需求调整
+
+
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 3314266280@qq.com
+    password: wnsdtiqihqkvdcac
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            from: 3314266280@qq.com
+    default-encoding: UTF-8
+    protocol: smtp
+
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# 配置swagger文档的访问路径，访问地址：http://127.0.0.1:8080/swagger-ui.html
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Logger Config
+logging:
+  level:
+    com.hexadecimal: debug
+
+uploadFile:
+  location: C:/Users/SevenF/Videos/APIVideo/ # 自定义上传视频本地保存路径
+
+uploadAvatar:
+  location: C:/Users/SevenF/Videos/APIPic/  # 自定义上传图片本地保存路径
