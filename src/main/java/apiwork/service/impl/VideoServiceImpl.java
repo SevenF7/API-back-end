@@ -91,4 +91,11 @@ public class VideoServiceImpl implements VideoService {
         IPage<Video> resultPage = videoMapper.selectPage(videoPage, queryWrapper);
         return new PageBean<>(resultPage.getTotal(), resultPage.getRecords());
     }
+
+    @Override
+    public List<Video> getAllRecommendedVideos(String userId) {
+        List<Video> video_list = videoMapper.selectAllVideoOrderByDigg();
+
+        return video_list;
+    }
 }

@@ -4,6 +4,7 @@ import apiwork.pojo.PageBean;
 import apiwork.pojo.Result;
 import apiwork.pojo.User;
 import apiwork.pojo.Video;
+import apiwork.service.HistoryService;
 import apiwork.service.UserService;
 import apiwork.service.VideoService;
 import apiwork.utils.ThreadLocalUtil;
@@ -25,6 +26,9 @@ public class VideoController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private HistoryService historyService;
 
     @GetMapping("/")
     public Video getVideoByVideoId(@RequestParam String videoId) {
@@ -83,6 +87,19 @@ public class VideoController {
                                                 @RequestParam(defaultValue = "1") int page,
                                                 @RequestParam(defaultValue = "10") int pageSize) {
         return videoService.getAllVideosByUserId(userId, page, pageSize);
+    }
+
+    @GetMapping("/recommend")
+    public List<Video> getRecommendVideos() {
+        // 查找当前登录的用户
+        Map<String, Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
+        String currentUserId = userService.findByUserName(username).getId();
+
+        List<Video> video_list = videoService.getAllRecommendedVideos(currentUserId);
+        video_list.removeIf(video -> historyService.isHaveHistory(currentUserId, video.getVideoId()));
+
+        return video_list;
     }
 }
 

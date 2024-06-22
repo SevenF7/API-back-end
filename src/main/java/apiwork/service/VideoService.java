@@ -22,4 +22,7 @@ public interface VideoService {
 
     // 分页查看我的所有视频
     PageBean<Video> getAllVideosByUserId(String userId, int page, int pageSize);
+
+    // 推荐算法（按照播放量降序排列，并剔除已经观看过得视频）
+    List<Video> getAllRecommendedVideos(String userId);
 }

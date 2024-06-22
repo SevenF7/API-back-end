@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface VideoMapper extends BaseMapper<Video> {
 
@@ -14,4 +16,7 @@ public interface VideoMapper extends BaseMapper<Video> {
 
     @Delete("delete from video where video_id=#{videoId}")
     void deleteVideoByVideoId(String videoId);
+
+    @Select("select * from video order by digg_count desc")
+    List<Video> selectAllVideoOrderByDigg();
 }
