@@ -98,4 +98,14 @@ public class VideoServiceImpl implements VideoService {
 
         return video_list;
     }
+
+    @Override
+    public void updateIncreaseVideoLike(String videoId) {
+        videoMapper.updateIncreaseVideoLike(videoId);
+    }
+
+    @Override
+    public void updateReduceVideoLike(String videoId) {
+        videoMapper.updateReduceVideoLike(videoId);
+    }
 }

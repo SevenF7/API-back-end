@@ -25,4 +25,11 @@ public interface VideoService {
 
     // 推荐算法（按照播放量降序排列，并剔除已经观看过得视频）
     List<Video> getAllRecommendedVideos(String userId);
+
+    // 点赞数增加
+    void updateIncreaseVideoLike(String videoId);
+
+    // 点赞数减少
+    void updateReduceVideoLike(String videoId);
+
 }

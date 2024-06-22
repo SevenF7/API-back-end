@@ -5,6 +5,7 @@ import apiwork.pojo.Result;
 import apiwork.pojo.User;
 import apiwork.pojo.Video;
 import apiwork.service.HistoryService;
+import apiwork.service.LikeService;
 import apiwork.service.UserService;
 import apiwork.service.VideoService;
 import apiwork.utils.ThreadLocalUtil;
@@ -29,6 +30,9 @@ public class VideoController {
 
     @Autowired
     private HistoryService historyService;
+
+    @Autowired
+    private LikeService likeService;
 
     @GetMapping("/")
     public Video getVideoByVideoId(@RequestParam String videoId) {
@@ -100,6 +104,47 @@ public class VideoController {
         video_list.removeIf(video -> historyService.isHaveHistory(currentUserId, video.getVideoId()));
 
         return video_list;
+    }
+
+    // 实现点赞
+    @PostMapping("/like")
+    public Result likeVideo(@RequestParam String videoId) {
+        // 查找当前登录的用户
+        Map<String, Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
+        String currentUserId = userService.findByUserName(username).getId();
+
+        // 该用户是否已经点过赞了
+        if (likeService.isHaveLike(currentUserId, videoId)) {
+            // 如果已经点过赞，返回错误
+            return Result.error("您已经点过赞了！");
+        }
+        else {
+            // 未点赞，则点赞数增加并添加到点赞表
+            videoService.updateIncreaseVideoLike(videoId);
+            likeService.addLike(currentUserId, videoId);
+            return Result.success("点赞成功");
+        }
+    }
+
+    @PostMapping("/dislike")
+    public Result dislikeVideo(@RequestParam String videoId) {
+        // 查找当前登录的用户
+        Map<String, Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
+        String currentUserId = userService.findByUserName(username).getId();
+
+        // 该用户是否已经点过赞了
+        if (likeService.isHaveLike(currentUserId, videoId)) {
+            // 如果已经点过赞，删除点赞信息，点赞数减一
+            videoService.updateReduceVideoLike(videoId);
+            likeService.deleteLike(currentUserId, videoId);
+            return Result.success();
+        }
+        else {
+            // 未点赞，则返回错误
+            return Result.error("取消点赞失败！");
+        }
     }
 }
 

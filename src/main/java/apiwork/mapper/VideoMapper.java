@@ -19,4 +19,10 @@ public interface VideoMapper extends BaseMapper<Video> {
 
     @Select("select * from video order by digg_count desc")
     List<Video> selectAllVideoOrderByDigg();
+
+    @Select("update video set digg_count = digg_count + 1 where video_id=#{videoId}")
+    void updateIncreaseVideoLike(String videoId);
+
+    @Select("update video set digg_count = digg_count - 1 where video_id=#{videoId}")
+    void updateReduceVideoLike(String videoId);
 }
