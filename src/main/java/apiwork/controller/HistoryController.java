@@ -3,7 +3,8 @@ package apiwork.controller;
 
 import apiwork.pojo.History;
 import apiwork.pojo.Result;
-import apiwork.pojo.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import apiwork.service.HistoryService;
 import apiwork.service.UserService;
 import apiwork.utils.ThreadLocalUtil;
@@ -24,8 +25,13 @@ public class HistoryController {
     @Autowired
     private UserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(HistoryController.class);
+
+
     @PostMapping("/add")
     public Result addHistory(@RequestParam String videoId) {
+        logger.info("Adding history for videoId: {}", videoId);
+
         // 查找当前登录的用户
         Map<String, Object> map = ThreadLocalUtil.get();
         String username = (String) map.get("username");
@@ -47,6 +53,8 @@ public class HistoryController {
 
     @GetMapping("/get")
     public List<History> getHistory(@RequestParam String userId) {
+        logger.info("Retrieving history for userId: {}", userId);
+
         return historyService.getAllHistoryByUserId(userId);
     }
 }

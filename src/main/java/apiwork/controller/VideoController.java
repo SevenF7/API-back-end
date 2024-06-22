@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/video")
@@ -54,6 +55,11 @@ public class VideoController {
     public Result uploadVideo(@RequestParam("userId") String userId,
                               @RequestParam("name") String name,
                               @RequestParam("file") MultipartFile file) {
+        if (Objects.equals(userId, "")) {
+            Map<String, Object> map = ThreadLocalUtil.get();
+            String username = (String) map.get("username");
+            userId = userService.findByUserName(username).getId();
+        }
         logger.info("Received request to upload video: userId={}, name={}", userId, name);
         try {
             Video video = new Video();

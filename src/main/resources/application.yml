@@ -48,7 +48,7 @@ logging:
     com.hexadecimal: debug
 
 uploadFile:
-  location: C:/Users/SevenF/Videos/APIVideo/ # 自定义上传视频本地保存路径
+  location: C:/Users/dell/Videos/APIVideo/ # 自定义上传视频本地保存路径
 
 uploadAvatar:
-  location: C:/Users/SevenF/Videos/APIPic/  # 自定义上传图片本地保存路径
+  location: C:/Users/dell/Pictures/APIPic/  # 自定义上传图片本地保存路径

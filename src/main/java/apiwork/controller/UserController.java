@@ -8,7 +8,8 @@ import apiwork.utils.JwtUtil;
 import apiwork.utils.Md5Util;
 import apiwork.utils.ThreadLocalUtil;
 import jakarta.validation.constraints.Pattern;
-import org.hibernate.validator.constraints.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
@@ -41,11 +42,16 @@ public class UserController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate2;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+
+
     // Done
     //注册
     @PostMapping("/register")
     public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, String nickname, String email,
                            @Pattern(regexp = "^\\S{5,16}$") String password, String rePwd, String code) {
+        logger.info("Received registration request for username: {}", username);
 
         //查询用户
         User u = userService.findByUserName(username);
@@ -62,6 +68,7 @@ public class UserController {
                     throw new RuntimeException();
                 }
             } catch (Exception exception) {
+                logger.error("Failed to retrieve verification code from Redis for email: {}", email, exception);
                 return Result.error("验证码过期");
             }
             if (!redisToken.equals(code)) {
@@ -70,6 +77,7 @@ public class UserController {
             userService.register(username, nickname, email, password);
             return Result.success();
         } else {
+            logger.warn("Username {} is already taken", username);
             //占用
             return Result.error("用户名·已被占用！");
         }
@@ -80,9 +88,11 @@ public class UserController {
     // Done
     @PostMapping("/login")
     public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
+        logger.info("Received login request for username: {}", username);
         User loginUser = userService.findByUserName(username);
         //判断用户名是否存在
         if (loginUser == null) {
+            logger.warn("User with username {} not found", username);
             return Result.error("用户名错误！");
         } else {
             if (Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
@@ -94,8 +104,10 @@ public class UserController {
 //                Redis相关内容，为了方便测试，最后一次版本取消注释即可
                 ValueOperations<String, String> operations = stringRedisTemplate1.opsForValue();
                 operations.set(tocken, tocken, 24, TimeUnit.HOURS);
+                logger.info("User {} logged in successfully", username);
                 return Result.success(tocken);
             } else {
+                logger.warn("Incorrect password for user {}", username);
                 return Result.error("密码错误！");
             }
         }
@@ -140,6 +152,7 @@ public class UserController {
             userService.updateAvatar(file);
             return Result.success();
         } catch (IOException e) {
+            logger.error("Failed to update avatar", e);
             return Result.error(e.getMessage());
         }
     }
@@ -182,6 +195,7 @@ public class UserController {
         System.out.println(operations);
         boolean flage = userService.sendVerificationCode(email, code);
         if (!flage) {
+            logger.error("Failed to send verification code to email: {}", email);
             return Result.error("发送失败");
         }
         return Result.success();
@@ -200,6 +214,7 @@ public class UserController {
         System.out.println(operations);
         boolean flage = userService.sendVerificationCode(email, code);
         if (!flage) {
+            logger.error("Failed to send verification code to email: {}", email);
             return Result.error("发送失败");
         }
         return Result.success();
@@ -217,6 +232,7 @@ public class UserController {
                 throw new RuntimeException();
             }
         } catch (Exception exception) {
+            logger.error("Failed to retrieve verification code from Redis for email: {}", email, exception);
             return Result.error("验证码过期");
         }
         if (!redisToken.equals(code)) {
